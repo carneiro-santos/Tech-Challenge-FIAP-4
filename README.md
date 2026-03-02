@@ -97,7 +97,7 @@ O painel apresenta:
 Sistema interativo para predição em tempo real:
 
 🔗 **Acesse a Aplicação:**  
-(cole aqui o link do seu Streamlit quando estiver publicado)
+(https://tech-challenge-fiap-4-rm366038.streamlit.app)
 
 Funcionalidades:
 
