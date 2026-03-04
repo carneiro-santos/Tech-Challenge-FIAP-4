@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import joblib
 
 st.set_page_config(
@@ -9,9 +8,9 @@ st.set_page_config(
     layout="wide"
 )
 
-# =============================
-# Carregar modelo
-# =============================
+st.title("🏥 Sistema Preditivo de Nível de Obesidade")
+st.markdown("**Aluno:** Vitor Santos  \n**RM:** 366038")
+st.markdown("---")
 
 @st.cache_resource
 def load_model():
@@ -19,119 +18,69 @@ def load_model():
 
 model = load_model()
 
-# =============================
-# Título
-# =============================
+st.subheader("📋 Preencha os dados")
 
-st.title("🏥 Sistema Preditivo de Nível de Obesidade")
-st.markdown("### Tech Challenge - FIAP")
-st.markdown("**Aluno:** Vitor Santos  \n**RM:** 366038")
+Gender = st.selectbox("Gênero", ["Male", "Female"])
+Age = st.number_input("Idade", 14, 80)
+Height = st.number_input("Altura (cm)", 100, 230)
+Weight = st.number_input("Peso (kg)", 30.0, 200.0)
 
-# =============================
-# Abas
-# =============================
+family_history = st.selectbox("Histórico familiar?", ["yes", "no"])
+FAVC = st.selectbox("Alimentos calóricos frequentes?", ["yes", "no"])
+SMOKE = st.selectbox("Fuma?", ["yes", "no"])
+SCC = st.selectbox("Monitora calorias?", ["yes", "no"])
 
-tab1, tab2, tab3 = st.tabs(["🔎 Predição", "📊 Modelo", "📘 Documentação"])
+FCVC = st.slider("Consumo de vegetais", 1.0, 3.0, 2.0)
+NCP = st.slider("Número de refeições", 1.0, 4.0, 3.0)
+CH2O = st.slider("Consumo de água", 1.0, 3.0, 2.0)
+FAF = st.slider("Atividade física", 0.0, 3.0, 1.0)
+TUE = st.slider("Uso de tecnologia", 0.0, 2.0, 1.0)
 
-# =============================
-# ABA 1 - PREDIÇÃO
-# =============================
+CAEC = st.selectbox(
+    "Come entre refeições?",
+    ["no", "Sometimes", "Frequently", "Always"]
+)
 
-with tab1:
+CALC = st.selectbox(
+    "Consome álcool?",
+    ["no", "Sometimes", "Frequently", "Always"]
+)
 
-    st.subheader("Entrada de Dados Biométricos")
+MTRANS = st.selectbox(
+    "Meio de transporte",
+    ["Automobile", "Bike", "Motorbike",
+     "Public_Transportation", "Walking"]
+)
 
-    col1, col2 = st.columns(2)
+if st.button("🔮 Realizar Predição"):
 
-    with col1:
-        idade = st.number_input("Idade", 10, 100, 25)
-        altura = st.number_input("Altura (m)", 1.0, 2.5, 1.70)
+    input_data = pd.DataFrame([{
+        "Gender": Gender,
+        "Age": Age,
+        "Height": Height,
+        "Weight": Weight,
+        "family_history": family_history,
+        "FAVC": FAVC,
+        "SMOKE": SMOKE,
+        "SCC": SCC,
+        "FCVC": FCVC,
+        "NCP": NCP,
+        "CH2O": CH2O,
+        "FAF": FAF,
+        "TUE": TUE,
+        "CAEC": CAEC,
+        "CALC": CALC,
+        "MTRANS": MTRANS
+    }])
 
-    with col2:
-        peso = st.number_input("Peso (kg)", 30.0, 200.0, 70.0)
-        atividade = st.slider("Frequência de Atividade Física (0-3)", 0, 3, 1)
+    prediction = model.predict(input_data)[0]
+    probability = model.predict_proba(input_data).max()
 
-    if st.button("🔎 Realizar Predição"):
+    imc = Weight / ((Height / 100) ** 2)
 
-        imc = peso / (altura ** 2)
+    st.success(f"🧠 Classificação Prevista: **{prediction}**")
+    st.info(f"📊 Confiança do Modelo: **{probability:.2%}**")
+    st.write(f"⚖ IMC: {imc:.2f}")
 
-        dados = pd.DataFrame({
-            "Age": [idade],
-            "Height": [altura],
-            "Weight": [peso],
-            "FAF": [atividade],
-            "BMI": [imc]
-        })
-
-        resultado = model.predict(dados)[0]
-
-        st.success(f"🎯 Nível de Obesidade Predito: {resultado}")
-        st.info(f"IMC Calculado: {imc:.2f}")
-
-        st.markdown("### 📘 Interpretação")
-        st.write("""
-        A predição é baseada em padrões estatísticos aprendidos a partir de dados históricos.
-        O modelo considera principalmente peso, altura e IMC como variáveis mais relevantes.
-        """)
-
-# =============================
-# ABA 2 - MODELO
-# =============================
-
-with tab2:
-
-    st.subheader("Informações do Modelo")
-
-    st.markdown("""
-    **Algoritmo utilizado:** Random Forest Classifier  
-    **Tipo de problema:** Classificação Multiclasse  
-    **Variáveis utilizadas:** Age, Height, Weight, FAF, BMI  
-    **Técnica de validação:** Train/Test Split (80/20)  
-    """)
-
-    st.markdown("### 📊 Métricas de Desempenho")
-
-    st.metric("Acurácia Aproximada", "88% - 92%")
-    st.metric("Tipo de Modelo", "Ensemble Learning")
-    st.metric("Complexidade", "Média")
-
-    st.markdown("### 📈 Importância das Variáveis")
-
-    importancia = pd.DataFrame({
-        "Variável": model.feature_names_in_,
-        "Importância": model.feature_importances_
-    }).sort_values(by="Importância", ascending=False)
-
-    st.bar_chart(importancia.set_index("Variável"))
-
-# =============================
-# ABA 3 - DOCUMENTAÇÃO
-# =============================
-
-with tab3:
-
-    st.subheader("Descrição do Projeto")
-
-    st.markdown("""
-    Este projeto tem como objetivo desenvolver um sistema preditivo
-    capaz de classificar o nível de obesidade com base em dados biométricos.
-
-    ### Metodologia:
-    - Análise exploratória dos dados
-    - Engenharia de features (cálculo do IMC)
-    - Treinamento com Random Forest
-    - Avaliação com métricas de classificação
-
-    ### Tecnologias:
-    - Python
-    - Pandas
-    - Scikit-learn
-    - Streamlit
-
-    ### Limitações:
-    - Modelo treinado apenas com variáveis numéricas
-    - Não substitui avaliação médica
-    """)
-
-    st.markdown("---")
-    st.caption("Projeto acadêmico - FIAP Tech Challenge")
+st.markdown("---")
+st.caption("Projeto Acadêmico - FIAP - 2026")
