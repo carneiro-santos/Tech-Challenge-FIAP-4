@@ -11,38 +11,11 @@ st.write("Preencha os dados abaixo para realizar a predição.")
 # Carregar modelo
 model = joblib.load("obesity_model.pkl")
 
-# -----------------------------
 # Inputs
-# -----------------------------
-
-idade = st.number_input("Idade", 10, 100, 25)
-altura = st.number_input("Altura (m)", 1.0, 2.5, 1.70)
-peso = st.number_input("Peso (kg)", 30.0, 200.0, 70.0)
-
-genero = st.selectbox("Gênero", ["Male", "Female"])
-
+idade = st.number_input("Idade", min_value=10, max_value=100, value=25)
+altura = st.number_input("Altura (m)", min_value=1.0, max_value=2.5, value=1.70)
+peso = st.number_input("Peso (kg)", min_value=30.0, max_value=200.0, value=70.0)
 atividade = st.slider("Frequência de Atividade Física (0-3)", 0, 3, 1)
-tempo_tela = st.slider("Tempo de Tela (0-3)", 0, 3, 1)
-agua = st.slider("Consumo de Água (0-3)", 0, 3, 2)
-vegetais = st.slider("Consumo de Vegetais (0-3)", 0, 3, 2)
-refeicoes = st.slider("Número de Refeições (1-4)", 1, 4, 3)
-
-historico = st.selectbox("Histórico Familiar de Obesidade", ["yes", "no"])
-alto_calorico = st.selectbox("Consumo Frequente de Alta Caloria", ["yes", "no"])
-fumante = st.selectbox("Fumante", ["yes", "no"])
-monitora = st.selectbox("Monitora Calorias", ["yes", "no"])
-
-caec = st.selectbox("Consumo Entre Refeições", ["no", "Sometimes", "Frequently", "Always"])
-alcool = st.selectbox("Consumo de Álcool", ["no", "Sometimes", "Frequently", "Always"])
-
-transporte = st.selectbox(
-    "Meio de Transporte",
-    ["Automobile", "Motorbike", "Bike", "Public_Transportation", "Walking"]
-)
-
-# -----------------------------
-# Predição
-# -----------------------------
 
 if st.button("Realizar Predição"):
 
@@ -52,19 +25,7 @@ if st.button("Realizar Predição"):
         "Age": [idade],
         "Height": [altura],
         "Weight": [peso],
-        "Gender": [genero],
-        "FCVC": [vegetais],
-        "NCP": [refeicoes],
-        "CH2O": [agua],
         "FAF": [atividade],
-        "TUE": [tempo_tela],
-        "family_history": [historico],
-        "FAVC": [alto_calorico],
-        "SMOKE": [fumante],
-        "SCC": [monitora],
-        "CAEC": [caec],
-        "CALC": [alcool],
-        "MTRANS": [transporte],
         "BMI": [imc]
     })
 
