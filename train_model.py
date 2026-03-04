@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import joblib
 
 from sklearn.model_selection import train_test_split
@@ -7,13 +6,13 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, accuracy_score
 
 # ===============================
-# 1. Carregar base de dados
+# 1. Carregar Dataset
 # ===============================
 
 df = pd.read_csv("Obesity.csv")
 
 # ===============================
-# 2. Engenharia de Features
+# 2. Engenharia de Feature
 # ===============================
 
 # Criar IMC
@@ -27,7 +26,7 @@ X = df[features]
 y = df[target]
 
 # ===============================
-# 3. Dividir treino e teste
+# 3. Dividir Treino/Teste
 # ===============================
 
 X_train, X_test, y_train, y_test = train_test_split(
@@ -44,18 +43,17 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 model = RandomForestClassifier(
     n_estimators=300,
-    max_depth=None,
     random_state=42
 )
 
 # ===============================
-# 5. Treinar Modelo
+# 5. Treinar
 # ===============================
 
 model.fit(X_train, y_train)
 
 # ===============================
-# 6. Avaliação
+# 6. Avaliar
 # ===============================
 
 y_pred = model.predict(X_test)
@@ -66,21 +64,9 @@ print("\nRelatório de Classificação:\n")
 print(classification_report(y_test, y_pred))
 
 # ===============================
-# 7. Importância das Variáveis
-# ===============================
-
-importances = pd.DataFrame({
-    "Variável": features,
-    "Importância": model.feature_importances_
-}).sort_values(by="Importância", ascending=False)
-
-print("\n🔎 Importância das Variáveis:\n")
-print(importances)
-
-# ===============================
-# 8. Salvar Modelo
+# 7. Salvar Modelo
 # ===============================
 
 joblib.dump(model, "obesity_model.pkl")
 
-print("\n✅ Modelo salvo como 'obesity_model.pkl'")
+print("\n✅ Modelo salvo com sucesso como 'obesity_model.pkl'")
